@@ -65,7 +65,6 @@ dnf install -y \
 dnf install -y \
     alacritty \
     kitty \
-    ghostty \
     wl-clipboard
 # --- PODMAN ---
 dnf install -y \
@@ -104,8 +103,6 @@ mkdir -p /etc/skel/.config/noctalia
 cp -rf /ctx/dot_config/noctalia /etc/skel/.config/noctalia
 mkdir -p /etc/skel/.config/kitty
 cp -rf /ctx/dot_config/kitty /etc/skel/.config/kitty
-mkdir -p /etc/skel/.config/ghostty
-cp -rf /ctx/dot_config/ghostty /etc/skel/.config/ghostty
 
 # 5. Installazione e configurazione del Display Manager (gdm)
 systemctl enable gdm
