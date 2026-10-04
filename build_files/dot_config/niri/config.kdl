@@ -1,10 +1,10 @@
-
+ 
 //environment {
 //    XDG_CURRENT_DESKTOP "niri"
 //    XDG_SESSION_TYPE "wayland"
 //}
 
-//prefer-no-csd
+prefer-no-csd
 
 input {
     keyboard {
@@ -83,7 +83,7 @@ output "HDMI-A-1" {
 }
 
 output "HDMI-A-2" {
-    // off
+    off
     mode "1920x1080@60.000"
     scale 1.25
     transform "normal"
@@ -135,9 +135,11 @@ layout {
 
 //spawn-at-startup "systemctl" "--user" "import-environment" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
 //spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP=niri"
-//spawn-at-startup "systemctl" "--user" "start" "--now" "niri-xdg-menu.service"
-//spawn-at-startup "systemctl" "--user" "start" "--now" "niri-polkit.service"
-spawn-sh-at-startup "lxpolkit"
+spawn-at-startup "systemctl" "--user" "start" "--now" "niri-polkit.service"
+spawn-at-startup "noctalia" "--daemon"
+spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets"
+spawn-at-startup "xwayland-satellite" ":"
+//spawn-at-startup "netbird-ui"
 
 hotkey-overlay {
     skip-at-startup
@@ -207,9 +209,8 @@ binds {
 
     Mod+Shift+Slash { show-hotkey-overlay; }
 
-    //Mod+Return hotkey-overlay-title="Open a Terminal: konsole" { spawn-sh "flatpak run org.kde.konsole"; }
-    Mod+Return { spawn "kitty"; }
-    //Mod+Space hotkey-overlay-title="Run Quickshell Menu" { spawn-sh "qs -c noctalia-shell ipc call launcher toggle"; }
+    Mod+Return hotkey-overlay-title="Open a Terminal: konsole" { spawn "kitty"; }
+    Mod+Space hotkey-overlay-title="Run Quickshell Menu" { spawn-sh "noctalia msg panel-toggle launcher"; }
     Mod+Ctrl+A hotkey-overlay-title="Run Kate" { spawn-sh "flatpak run org.kde.kate"; }
     Mod+Ctrl+E hotkey-overlay-title="Open OnlyOffice" { spawn-sh "flatpak run org.onlyoffice.desktopeditors"; }
     Mod+Ctrl+U hotkey-overlay-title="Run Okular" { spawn-sh "flatpak run org.kde.okular"; }
@@ -477,5 +478,3 @@ binds {
 
     Mod+Shift+P { power-off-monitors; }
 }
-
-include "dms/dms.kdl"

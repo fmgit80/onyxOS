@@ -1,0 +1,10 @@
+{
+  "refreshInterval": 5000,
+  "compactMode": false,
+  "showIpAddress": true,
+  "hideDisconnected": false,
+  "showPing": false,
+  "terminalCommand": "",
+  "pingCount": 3,
+  "defaultPeerAction": "copy-ip"
+}

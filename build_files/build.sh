@@ -11,8 +11,6 @@ sed -i '/^\[main\]/a max_parallel_downloads=10' /etc/dnf/dnf.conf
 # 1. Abilitazione del repository COPR per DankMaterialShell (DMS) e llama-cpp
 echo "--- Abilitazione COPR per DMS ---"
 dnf -y install dnf-plugins-core
-dnf copr enable -y avengemedia/danklinux
-dnf copr enable -y avengemedia/dms
 dnf copr enable -y sneed/llama-cpp-vulkan
 
 # 2. Installazione dei pacchetti richiesti
@@ -26,6 +24,7 @@ dnf install -y \
     gnome-keyring \
     lxpolkit \
     xdg-utils \
+    xwayland-satellite \
     xorg-x11-server-Xwayland
 # --- AUDIO & PIPEWIRE ---
 dnf install -y \
@@ -55,23 +54,18 @@ dnf install -y \
     bluez \
     bluez-tools \
     blueman
-# --- DESKTOP ENVIRONMENT (NIRI + DMS) ---
+# --- DESKTOP ENVIRONMENT (NIRI + NOCTALIA) ---
 dnf install -y \
+    gdm \
     niri \
-    dms \
+    noctalia \
     quickshell \
-    matugen \
-    cliphist \
-    danksearch \
-    dgop \
-    dankcalendar-git \
-    ghostty \
-    dms-greeter
+    cliphist
 # --- UTILITY AGGIUNTIVE E COMPATIBILITÀ ---
 dnf install -y \
     alacritty \
     kitty \
-    gnome-keyring \
+    ghostty \
     wl-clipboard
 # --- PODMAN ---
 dnf install -y \
@@ -103,37 +97,32 @@ systemctl enable bluetooth.service
 systemctl enable podman.socket
 systemctl enable docker
 
-# 4. Configurazione Automatica di Niri per DMS via /etc/skel (Metodo Pseudo)
-mkdir -p /etc/skel/.config/niri/dms
+# 4. Configurazione Automatica dei dotfiles in /etc/skel
+mkdir -p /etc/skel/.config/niri
 cp -rf /ctx/dot_config/niri/config.kdl /etc/skel/.config/niri/
+mkdir -p /etc/skel/.config/noctalia
+cp -rf /ctx/dot_config/noctalia /etc/skel/.config/noctalia
+mkdir -p /etc/skel/.config/kitty
+cp -rf /ctx/dot_config/kitty /etc/skel/.config/kitty
+mkdir -p /etc/skel/.config/ghostty
+cp -rf /ctx/dot_config/ghostty /etc/skel/.config/ghostty
 
-# Generiamo il file dms.kdl inserendo l'avvio automatico e l'interfaccia
-cat > /etc/skel/.config/niri/dms/dms.kdl << 'EOF'
-spawn-at-startup "dms" "run"
-EOF
-
-# 5. Installazione e configurazione del Display Manager (greetd + dms-greeter)
-mkdir -p /etc/greetd/
-cat > /etc/greetd/config.toml << EOF
-[terminal]
-vt = 1
-
-[default_session]
-user = "greeter"
-command = "dms-greeter --command niri"
-EOF
-
-# 6. Abilitazione di greetd disabilitando eventauli GDM/SDDM preesistenti
-rm -f /etc/systemd/system/display-manager.service
-ln -s /usr/lib/systemd/system/greetd.service /etc/systemd/system/display-manager.service
-systemctl enable --force greetd.service
-mkdir -p /etc/skel/.config/systemd/user/graphical-session.target.wants
-ln -s /usr/lib/systemd/user/dms.service /etc/skel/.config/systemd/user/graphical-session.target.wants/
+# 5. Installazione e configurazione del Display Manager (gdm)
+systemctl enable gdm
 
 # 7. Installazione di NetBird
-#curl -Lo /etc/yum.repos.d/netbird.repo https://netbird.io
-#dnf -y install netbird
-#systemctl enable netbird.service
+cat > /etc/yum.repos.d/netbird.repo <<EOF
+[netbird]
+name=netbird
+baseurl=https://pkgs.netbird.io/yum/
+enabled=1
+gpgcheck=1
+gpgkey=https://pkgs.netbird.io/yum/repodata/repomd.xml.key
+repo_gpgcheck=1
+EOF
+dnf config-manager addrepo --from-repofile=/etc/yum.repos.d/netbird.repo
+dnf install netbird
+systemctl enable netbird
 
 # 8. Installa il pacchetto Flatpak di sistema
 dnf -y install flatpak
@@ -146,12 +135,10 @@ fi
 mkdir -p /etc/skel/.config/xdg-desktop-portal
 cat > /etc/skel/.config/xdg-desktop-portal/niri-portals.conf << 'EOF'
 [preferred]
-# Di base usa il portale GTK per selettori di file e dialoghi generici
 default=gtk
-
-# Usa esplicitamente il backend GNOME per lo screencast (condivisione schermo) e le impostazioni di sistema
 org.freedesktop.impl.portal.ScreenCast=gnome
-org.freedesktop.impl.portal.Settings=gnome
+org.freedesktop.impl.portal.Screenshot=gnome
+org.freedesktop.impl.portal.Secret=gnome-keyring
 EOF
 ln -sf niri-portals.conf /etc/skel/.config/xdg-desktop-portal/portals.conf
 
