@@ -108,17 +108,17 @@ cp -rf /ctx/dot_config/kitty /etc/skel/.config/kitty
 systemctl enable gdm
 
 # 7. Installazione di NetBird
-cat > /etc/yum.repos.d/netbird.repo <<EOF
-[netbird]
-name=netbird
-baseurl=https://pkgs.netbird.io/yum/
-enabled=1
-gpgcheck=1
-gpgkey=https://pkgs.netbird.io/yum/repodata/repomd.xml.key
-repo_gpgcheck=1
-EOF
-dnf install -y netbird
-systemctl enable netbird
+#cat > /etc/yum.repos.d/netbird.repo <<EOF
+#[netbird]
+#name=netbird
+#baseurl=https://pkgs.netbird.io/yum/
+#enabled=1
+#gpgcheck=1
+#gpgkey=https://pkgs.netbird.io/yum/repodata/repomd.xml.key
+#repo_gpgcheck=1
+#EOF
+#dnf install -y netbird
+#systemctl enable netbird
 
 # 8. Installa il pacchetto Flatpak di sistema
 dnf -y install flatpak
@@ -127,7 +127,7 @@ if flatpak remote-list | grep -q "fedora"; then
     flatpak remote-delete fedora
 fi
 
-# 8. CONFIGURAZIONE XDG DESKTOP PORTALS PER NIRI ---
+# 9. CONFIGURAZIONE XDG DESKTOP PORTALS PER NIRI ---
 mkdir -p /etc/skel/.config/xdg-desktop-portal
 cat > /etc/skel/.config/xdg-desktop-portal/niri-portals.conf << 'EOF'
 [preferred]
@@ -138,7 +138,7 @@ org.freedesktop.impl.portal.Secret=gnome-keyring
 EOF
 ln -sf niri-portals.conf /etc/skel/.config/xdg-desktop-portal/portals.conf
 
-# 9. Pulizia della cache per ridurre il peso dell'immagine finale
+# 10. Pulizia della cache per ridurre il peso dell'immagine finale
 dnf clean all
 rm -rf /run/dnf /run/selinux-policy
 rm -rf /var/lib/dnf
