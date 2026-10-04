@@ -117,7 +117,7 @@ gpgcheck=1
 gpgkey=https://pkgs.netbird.io/yum/repodata/repomd.xml.key
 repo_gpgcheck=1
 EOF
-dnf install netbird
+dnf install -y netbird
 systemctl enable netbird
 
 # 8. Installa il pacchetto Flatpak di sistema
