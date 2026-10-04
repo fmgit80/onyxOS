@@ -19,9 +19,11 @@ echo "--- Installazione pacchetti di sistema ---"
 dnf install -y \
     wayland-utils \
     xdg-desktop-portal \
-    xdg-desktop-portal-gtk \
-    xdg-desktop-portal-gnome \
+    #xdg-desktop-portal-gtk \
+    #xdg-desktop-portal-gnome \
+    xdg-desktop-portal-kde \
     gnome-keyring \
+    lxpolkit \
     xdg-utils \
     xwayland-satellite \
     xorg-x11-server-Xwayland
@@ -55,6 +57,7 @@ dnf install -y \
     blueman
 # --- DESKTOP ENVIRONMENT (NIRI + NOCTALIA) ---
 dnf install -y \
+    #gdm \
     niri \
     noctalia \
     quickshell \
@@ -102,8 +105,8 @@ cp -rf /ctx/dot_config/noctalia /etc/skel/.config/noctalia
 mkdir -p /etc/skel/.config/kitty
 cp -rf /ctx/dot_config/kitty /etc/skel/.config/kitty
 
-# 5. Installazione e configurazione del Display Manager (sddm)
-#systemctl enable sddm
+# 5. Installazione e configurazione del Display Manager (gdm)
+systemctl enable gdm
 
 # 7. Installazione di NetBird
 #cat > /etc/yum.repos.d/netbird.repo <<EOF
