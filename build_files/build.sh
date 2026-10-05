@@ -13,7 +13,6 @@ echo "--- Abilitazione COPR ---"
 dnf -y install dnf-plugins-core
 dnf copr enable -y avengemedia/danklinux
 dnf copr enable -y avengemedia/dms
-dnf copr enable -y kmf/dank-ws-copr
 dnf copr enable -y sneed/llama-cpp-vulkan
 
 # 2. Installazione dei pacchetti richiesti
