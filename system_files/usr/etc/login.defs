@@ -1,0 +1,6 @@
+SUB_UID_MIN                  100000
+SUB_UID_MAX                  600100000
+SUB_UID_COUNT                65536
+SUB_GID_MIN                  100000
+SUB_GID_MAX                  600100000
+SUB_GID_COUNT                65536

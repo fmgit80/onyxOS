@@ -1,0 +1,13 @@
+[Unit]
+Description=LXPolkit Authentication Agent
+Documentation=man:lxpolkit(1)
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/usr/libexec/lxpolkit
+Restart=on-failure
+
+[Install]
+WantedBy=graphical-session.target

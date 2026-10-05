@@ -11,6 +11,9 @@ sed -i '/^\[main\]/a max_parallel_downloads=10' /etc/dnf/dnf.conf
 # 1. Abilitazione del repository COPR per DankMaterialShell (DMS) e llama-cpp
 echo "--- Abilitazione COPR ---"
 dnf -y install dnf-plugins-core
+dnf copr enable -y avengemedia/danklinux
+dnf copr enable -y avengemedia/dms
+dnf copr enable -y kmf/dank-ws-copr
 dnf copr enable -y sneed/llama-cpp-vulkan
 
 # 2. Installazione dei pacchetti richiesti
@@ -21,6 +24,8 @@ dnf install -y \
     xdg-desktop-portal \
     xdg-desktop-portal-gtk \
     xdg-desktop-portal-gnome \
+    xdg-desktop-portal-wlr \
+    lxpolkit \
     gnome-keyring \
     xdg-utils \
     xwayland-satellite \
@@ -55,17 +60,34 @@ dnf install -y \
     blueman
 # --- DESKTOP ENVIRONMENT (NIRI + NOCTALIA) ---
 dnf install -y \
+    meson gcc-c++ just \
+    wayland-devel wayland-protocols-devel \
+    libEGL-devel mesa-libGLES-devel \
+    freetype-devel fontconfig-devel \
+    cairo-devel pango-devel harfbuzz-devel \
+    libxkbcommon-devel glib2-devel \
+    libsecret-devel libsodium-devel \
+    sdbus-cpp-devel pipewire-devel wireplumber-devel \
+    pam-devel polkit-devel libcurl-devel libwebp-devel \
+    libjxl-devel libsndfile-devel librsvg2-devel \
+    libqalculate-devel libxml2-devel \
+    md4c-devel tomlplusplus-devel \
+    json-devel stb_image_resize2-devel stb_image_write-devel \
+    jemalloc-devel \
+    gdm \
     niri \
-    noctalia \
+    dms \
     quickshell \
-    cliphist
+    matugen cliphist danksearch dgop dankcalendar-git
 # --- UTILITY AGGIUNTIVE E COMPATIBILITÀ ---
 dnf install -y \
     alacritty \
     kitty \
+    cliphist \
     wl-clipboard
 # --- PODMAN ---
 dnf install -y \
+    shadow-utils slirp4netns fuse-overlayfs \
     podman \
     podman-compose
 # --- DOCKER ---
@@ -83,16 +105,31 @@ dnf install -y \
     docker-ce-cli \
     containerd.io \
     docker-buildx-plugin \
-    docker-compose-plugin
+    docker-compose-plugin \
+    docker-ce-rootless-extras
 # --- LLAMA-CPP ---
 dnf install -y \
     llama-cpp \
 
 # 3. Abilitazione dei servizi di sistema essenziali
+systemctl enable gdm
 systemctl enable NetworkManager.service
 systemctl enable bluetooth.service
 systemctl enable podman.socket
 systemctl enable docker
+echo "--- Abilitazione servizi utente globali ---"
+mkdir -p /usr/lib/systemd/user/graphical-session.target.wants
+
+# Abilita LXPolkit per la sessione grafica
+ln -s /usr/lib/systemd/user/lxpolkit.service /usr/lib/systemd/user/graphical-session.target.wants/lxpolkit.service
+# Se niri e dms espongono dei servizi systemd utente propri, abilitali così:
+if [ -f /usr/lib/systemd/user/niri.service ]; then
+    ln -s /usr/lib/systemd/user/niri.service /usr/lib/systemd/user/graphical-session.target.wants/niri.service
+fi
+
+if [ -f /usr/lib/systemd/user/dms.service ]; then
+    ln -s /usr/lib/systemd/user/dms.service /usr/lib/systemd/user/graphical-session.target.wants/dms.service
+fi
 
 # 4. Configurazione Automatica dei dotfiles in /etc/skel
 mkdir -p /etc/skel/.config/niri
@@ -126,15 +163,15 @@ if flatpak remote-list | grep -q "fedora"; then
 fi
 
 # 9. CONFIGURAZIONE XDG DESKTOP PORTALS PER NIRI ---
-mkdir -p /etc/skel/.config/xdg-desktop-portal
-cat > /etc/skel/.config/xdg-desktop-portal/niri-portals.conf << 'EOF'
-[preferred]
-default=gtk
-org.freedesktop.impl.portal.ScreenCast=gnome
-org.freedesktop.impl.portal.Screenshot=gnome
-org.freedesktop.impl.portal.Secret=gnome-keyring
-EOF
-ln -sf niri-portals.conf /etc/skel/.config/xdg-desktop-portal/portals.conf
+#mkdir -p /etc/skel/.config/xdg-desktop-portal
+#cat > /etc/skel/.config/xdg-desktop-portal/niri-portals.conf << 'EOF'
+#[preferred]
+#default=gtk
+#org.freedesktop.impl.portal.ScreenCast=gnome
+#org.freedesktop.impl.portal.Screenshot=gnome
+#org.freedesktop.impl.portal.Secret=gnome-keyring
+#EOF
+#ln -sf niri-portals.conf /etc/skel/.config/xdg-desktop-portal/portals.conf
 
 # 10. Pulizia della cache per ridurre il peso dell'immagine finale
 dnf clean all

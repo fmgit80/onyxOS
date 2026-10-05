@@ -135,11 +135,9 @@ layout {
 
 //spawn-at-startup "systemctl" "--user" "import-environment" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP"
 //spawn-at-startup "dbus-update-activation-environment" "--systemd" "WAYLAND_DISPLAY" "XDG_CURRENT_DESKTOP=niri"
-spawn-at-startup "systemctl" "--user" "start" "--now" "niri-polkit.service"
-spawn-at-startup "noctalia" "--daemon"
-spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets"
-spawn-at-startup "xwayland-satellite" ":"
-//spawn-at-startup "netbird-ui"
+//spawn-at-startup "systemctl" "--user" "start" "--now" "niri-polkit.service"
+//spawn-at-startup "gnome-keyring-daemon" "--start" "--components=secrets"
+//spawn-at-startup "xwayland-satellite" ":"
 
 hotkey-overlay {
     skip-at-startup

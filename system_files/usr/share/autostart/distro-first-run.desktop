@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Distro First Run Setup
+Comment=Inizializza DMS, Docker e i servizi utente al primo login
+Exec=/usr/libexec/distro-first-run.sh
+OnlyShowIn=niri;
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
