@@ -116,6 +116,7 @@ systemctl enable NetworkManager.service
 systemctl enable bluetooth.service
 systemctl enable podman.socket
 systemctl enable docker
+
 echo "--- Abilitazione servizi utente globali ---"
 mkdir -p /usr/lib/systemd/user/graphical-session.target.wants
 
@@ -130,13 +131,14 @@ if [ -f /usr/lib/systemd/user/dms.service ]; then
     ln -s /usr/lib/systemd/user/dms.service /usr/lib/systemd/user/graphical-session.target.wants/dms.service
 fi
 
+# Imposta i permessi corretti per gli script della distro
+echo "--- Impostazione permessi eseguibili ---"
+chmod +x /usr/libexec/distro-first-run.sh
+chmod +x /etc/profile.d/wayland-variables.sh
+
 # 4. Configurazione Automatica dei dotfiles in /etc/skel
-mkdir -p /etc/skel/.config/niri
-cp -rf /ctx/dot_config/niri/config.kdl /etc/skel/.config/niri/
-mkdir -p /etc/skel/.config/noctalia
-cp -rf /ctx/dot_config/noctalia /etc/skel/.config/noctalia
-mkdir -p /etc/skel/.config/kitty
-cp -rf /ctx/dot_config/kitty /etc/skel/.config/kitty
+#mkdir -p /etc/skel/.config/niri
+#cp -rf /ctx/dot_config/niri/config.kdl /etc/skel/.config/niri/
 
 # 5. Installazione e configurazione del Display Manager (sddm)
 #systemctl enable sddm
