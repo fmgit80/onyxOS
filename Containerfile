@@ -37,6 +37,17 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/build.sh
 
+# Disabilita il servizio di remount ridondante
+RUN systemctl mask systemd-remount-fs.service
+
+# Crea la directory per i parametri del kernel di bootc e scrive il parametro pci=noacpi all'interno della configurazione dell'immagine
+RUN mkdir -p /usr/lib/bootc/kargs.d
+RUN echo 'kargs = ["pci=noacpi"]' > /usr/lib/bootc/kargs.d/pci-fix.toml
+
+# Forza dracut a includere i file dei gruppi nell'initramfs
+RUN mkdir -p /usr/lib/dracut/dracut.conf.d && \
+    echo 'nsswheel="yes"' > /usr/lib/dracut/dracut.conf.d/10-nsswheel.conf
+
 ### LINTING
 ## Verify final image and contents are correct.
 RUN bootc container lint

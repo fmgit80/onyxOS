@@ -77,13 +77,15 @@ dnf install -y \
     niri \
     dms \
     quickshell \
+    kf6-kimageformats \
     matugen cliphist danksearch dgop dankcalendar-git
 # --- UTILITY AGGIUNTIVE E COMPATIBILITÀ ---
 dnf install -y \
     alacritty \
     kitty \
     cliphist \
-    wl-clipboard
+    wl-clipboard \
+    nano htop nvtop fastfetch
 # --- PODMAN ---
 dnf install -y \
     shadow-utils slirp4netns fuse-overlayfs \
@@ -111,13 +113,13 @@ dnf install -y \
     llama-cpp \
 
 # 3. Abilitazione dei servizi di sistema essenziali
-systemctl enable gdm
+echo "--- Abilitazione servizi utente e di sistema ---"
+
 systemctl enable NetworkManager.service
 systemctl enable bluetooth.service
 systemctl enable podman.socket
 systemctl enable docker
 
-echo "--- Abilitazione servizi utente globali ---"
 mkdir -p /usr/lib/systemd/user/graphical-session.target.wants
 
 # Abilita LXPolkit per la sessione grafica
@@ -131,10 +133,25 @@ if [ -f /usr/lib/systemd/user/dms.service ]; then
     ln -s /usr/lib/systemd/user/dms.service /usr/lib/systemd/user/graphical-session.target.wants/dms.service
 fi
 
+# GDM
+systemctl enable gdm
+systemctl set-default graphical.target
+ln -sf /usr/lib/systemd/system/gdm.service /etc/systemd/system/display-manager.service
+
 # Imposta i permessi corretti per gli script della distro
 echo "--- Impostazione permessi eseguibili ---"
 chmod +x /usr/libexec/distro-first-run.sh
 chmod +x /etc/profile.d/wayland-variables.sh
+
+# 4. Correzione errori
+# Crea il gruppo plugdev che viene cercato dalle regole udev di ZSA
+getent group plugdev || groupadd -r plugdev
+
+# Se vuoi che il tuo utente locale possa usare Keymapp/Wally di ZSA senza permessi di root,
+# puoi anche aggiungere i permessi standard di Fedora (uaccess) a quel file di regole
+if [ -f /usr/lib/udev/rules.d/50-zsa.rules ]; then
+    sed -i 's/GROUP="plugdev"/TAG+="uaccess"/g' /usr/lib/udev/rules.d/50-zsa.rules
+fi
 
 # 4. Configurazione Automatica dei dotfiles in /etc/skel
 #mkdir -p /etc/skel/.config/niri
